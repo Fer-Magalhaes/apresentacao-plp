@@ -374,7 +374,7 @@
 
 <div class="hud"><i id="bar"></i></div>
 <div class="count" id="count"></div>
-<div class="help" id="help">← → navegar · N roteiro · F tela cheia</div>
+<div class="help" id="help">Clique ou deslize para passar · ← → · N roteiro · F tela cheia</div>
 <div class="notes" id="notes"><div class="top"><span id="ncue"></span><span id="ntimer">0:00 / 4:00</span></div><div id="ntext"></div></div>
 
 <script>
@@ -420,7 +420,16 @@
     else return
     e.preventDefault()
   })
-  addEventListener('click', (e) => { if (!e.target.closest('.notes')) show(cur + (e.clientX > innerWidth / 3 ? 1 : -1)) })
+  // Clique ou toque avança; deslizar para a esquerda avança e para a direita volta.
+  addEventListener('click', (e) => { if (!e.target.closest('.notes')) show(cur + 1) })
+  let touchX = null
+  addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX }, { passive: true })
+  addEventListener('touchend', (e) => {
+    if (touchX === null) return
+    const dx = e.changedTouches[0].clientX - touchX
+    touchX = null
+    if (Math.abs(dx) > 50) { show(cur + (dx < 0 ? 1 : -1)); e.preventDefault() }
+  })
   addEventListener('resize', fit)
   setTimeout(() => (document.getElementById('help').style.opacity = 0), 6000)
   setInterval(tick, 1000)
